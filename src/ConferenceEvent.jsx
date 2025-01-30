@@ -56,14 +56,70 @@ const ConferenceEvent = () => {
     };
 
     const getItemsFromTotalCost = () => {
-        const items = [];
+      const items = [];
+      venueItems.forEach((item) => {
+        if (item.quantity > 0) {
+          items.push({ ...item, type: "venue" });
+        }
+      });
+      avItems.forEach((item) => {
+        if (
+          item.quantity > 0 &&
+          !items.some((i) => i.name === item.name && i.type === "av")
+        ) {
+          items.push({ ...item, type: "av" });
+        }
+      });
+      mealsItems.forEach((item) => {
+        if (item.selected) {
+          const itemForDisplay = { ...item, type: "meals" };
+          if (item.numberOfPeople) {
+            itemForDisplay.numberOfPeople = numberOfPeople;
+          }
+          items.push(itemForDisplay);
+        }
+      });
+      return items;
     };
 
     const items = getItemsFromTotalCost();
 
     const ItemsDisplay = ({ items }) => {
-
+      console.log(items);
+      return <>
+          <div className="display_box1">
+              {items.length === 0 && <p>No items selected</p>}
+              <table className="table_item_data">
+                  <thead>
+                      <tr>
+                          <th>Name</th>
+                          <th>Unit Cost</th>
+                          <th>Quantity</th>
+                          <th>Subtotal</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {items.map((item, index) => (
+                          <tr key={index}>
+                              <td>{item.name}</td>
+                              <td>${item.cost}</td>
+                              <td>
+                                  {item.type === "meals" || item.numberOfPeople
+                                  ? ` For ${numberOfPeople} people`
+                                  : item.quantity}
+                              </td>
+                              <td>{item.type === "meals" || item.numberOfPeople
+                                  ? `${item.cost * numberOfPeople}`
+                                  : `${item.cost * item.quantity}`}
+                              </td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+          </div>
+       </>
     };
+
     const calculateTotalCost = (section) => {
         let totalCost = 0;
         if (section === "venue") {
@@ -74,9 +130,11 @@ const ConferenceEvent = () => {
           avItems.forEach((item) => {
             totalCost += item.cost * item.quantity;
           });
-        } else if (section == "meals") {
-          mealsItems.forEach((item) => { // for each meal has different cost
-            totalCost += item.cost * numberOfPeople; 
+        } else if (section === "meals") {
+          mealsItems.forEach((item) => {
+            if (item.selected) {
+              totalCost += item.cost * numberOfPeople;
+            }
           });
         }
         return totalCost;
@@ -85,6 +143,12 @@ const ConferenceEvent = () => {
     const venueTotalCost = calculateTotalCost("venue");
     const avTotalCost = calculateTotalCost("av")
     const mealsTotalCost = calculateTotalCost("meals");
+
+    const totalCosts = {
+      venue: venueTotalCost,
+      av: avTotalCost,
+      meals: mealsTotalCost
+    };
 
     const navigateToProducts = (idType) => {
         if (idType == '#venue' || idType == '#addons' || idType == '#meals') {
@@ -217,6 +281,13 @@ const ConferenceEvent = () => {
 
                                 </div>
                                 <div className="meal_selection">
+                                  <div className="input-container venue_selection">
+                                      <label htmlFor="numberOfPeople"><h3>Number of People:</h3></label>
+                                      <input type="number" className="input_box5" id="numberOfPeople" value={numberOfPeople}
+                                          onChange={(e) => setNumberOfPeople(parseInt(e.target.value))}
+                                          min="1"
+                                      />
+                                  </div>
                                   {mealsItems.map((item, index) => (
                                       <div className="meal_item" key={index} style={{ padding: 15 }}>
                                           <div className="inner">
