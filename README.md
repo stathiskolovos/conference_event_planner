@@ -1,5 +1,7 @@
 # Practice project: Conference Expense Planner app
 
+app is hosted here: https://stathiskolovos.github.io/conference_event_planner/
+
 In the Conference Expense Planner app practice project, you will build the front end of an application that allows the user to price out the expenses related to hosting a conference at a convention center. The lab will guide you through the development of the application elements required for this project.
 
 The Conference Expense Planner will have a landing page, a product selection page, and a pop-up summary window. The product selection page allows users to select their rooms, their add-ons, and meals. Based on those selections, it provides pricing. The pop-up window summarizes the expenses in a table based on the user's selections from the product selection page.
